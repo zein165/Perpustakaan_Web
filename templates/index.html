@@ -54,15 +54,25 @@
                             Katalog Peminjaman Buku Mahasiswa
                         </h5>
 
-                        <!-- FORM PENCARIAN -->
-                        <form method="GET" action="{{ url_for('beranda') }}">
-                            <div class="input-group">
+                        <!-- FORM PENCARIAN & FILTER KATEGORI -->
+                        <form method="GET" action="{{ url_for('beranda') }}" class="row g-2">
+                            <div class="col-md-5">
                                 <input type="text" name="cari" class="form-control"
-                                    placeholder="Cari judul atau penulis..." value="{{ kata_kunci }}">
-                                <button class="btn btn-primary" type="submit">
+                                    placeholder="Cari judul atau penulis..." value="{{ kata_kunci or '' }}">
+                            </div>
+                            <div class="col-md-4">
+                                <select name="kategori" class="form-select">
+                                    <option value="">Semua Kategori</option>
+                                    {% for kat in daftar_kategori %}
+                                        <option value="{{ kat }}" {% if kategori_filter == kat %}selected{% endif %}>{{ kat }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-3 d-flex gap-2">
+                                <button class="btn btn-primary flex-grow-1" type="submit">
                                     <i class="fa-solid fa-magnifying-glass me-1"></i> Cari
                                 </button>
-                                {% if kata_kunci %}
+                                {% if kata_kunci or kategori_filter %}
                                 <a href="{{ url_for('beranda') }}" class="btn btn-secondary">
                                     <i class="fa-solid fa-rotate-left me-1"></i> Reset
                                 </a>
@@ -79,6 +89,7 @@
                                     <tr>
                                         <th class="ps-4">No</th>
                                         <th>Judul Buku</th>
+                                        <th>Kategori</th>
                                         <th>Penulis</th>
                                         <th class="text-center">Status Stok</th>
                                         <th class="text-center">Sirkulasi</th>
@@ -89,6 +100,11 @@
                                     <tr>
                                         <td class="ps-4 fw-bold text-secondary">{{ loop.index }}</td>
                                         <td><div class="fw-bold text-dark">{{ buku['judul'] }}</div></td>
+                                        <td>
+                                            <span class="badge bg-light text-dark border rounded-pill px-3">
+                                                {{ buku['kategori'] or 'Lainnya' }}
+                                            </span>
+                                        </td>
                                         <td><span class="text-muted">{{ buku['penulis'] }}</span></td>
                                         <td class="text-center">
                                             {% if buku['stok_tersedia'] > 0 %}
@@ -131,7 +147,7 @@
                                     </tr>
                                     {% else %}
                                     <tr>
-                                        <td colspan="5" class="text-center py-5 text-muted">
+                                        <td colspan="6" class="text-center py-5 text-muted">
                                             Buku tidak ditemukan.
                                         </td>
                                     </tr>
